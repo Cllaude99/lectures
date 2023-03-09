@@ -23,11 +23,8 @@ app.use(
   }),
 );
 
-<<<<<<< HEAD
-=======
 app.use(localsMiddleware);
 
->>>>>>> 01a65b890b0283f3afcd7c64c2035637e7ba9db2
 app.use("/", routeRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
