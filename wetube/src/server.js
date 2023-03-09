@@ -4,6 +4,7 @@ import session from "express-session";
 import routeRouter from "./routers/routeRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
+import { localsMiddleware } from "./middlewares";
 
 const app = express();
 const logger = morgan("dev");
@@ -22,6 +23,11 @@ app.use(
   }),
 );
 
+<<<<<<< HEAD
+=======
+app.use(localsMiddleware);
+
+>>>>>>> 01a65b890b0283f3afcd7c64c2035637e7ba9db2
 app.use("/", routeRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
