@@ -1,11 +1,16 @@
 import express from "express";
-import { see, edit, upload, deleteVideo } from "../controllers/videoController";
+import {
+  watch,
+  getEdit,
+  postEdit,
+  getUpload,
+  postUpload,
+} from "../controllers/videoController";
 
 const videoRouter = express.Router();
 
-videoRouter.get("/upload", upload);
-videoRouter.get("/:id(\\d+)", see);
-videoRouter.get("/:id(\\d+)/edit", edit);
-videoRouter.get("/:id(\\d+)/delete", deleteVideo);
+videoRouter.get("/:id([0-9a-f]{24})", watch);
+videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit); // route()함수를 통해 동일한 url로 get방식 post방식을 진행할 수 있도록 한다.
+videoRouter.route("/upload").get(getUpload).post(postUpload);
 
 export default videoRouter;
