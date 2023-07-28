@@ -1,8 +1,10 @@
 import express from "express";
 import morgan from "morgan";
-import globalRouter from "./routers/globalRouter";
+import session from "express-session";
+import globalRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
+import { localsMiddleware } from "./middlewares";
 
 const app = express();
 
@@ -13,6 +15,18 @@ app.set("view engine", "pug"); // view engine이 pug파일임을 알려주기 �
 app.use(logger);
 app.use(express.json()); // req.body값을 받을 수 있도록 다음과 같은 설정이 필요하다.
 app.use(express.urlencoded({ extended: true })); //form의 value 값을 자바스크립트 object값으로 불러오기 위해 다음과 같은 설정이 필요하다.
+
+app.use(
+  session({
+    // 세션 미들웨어를 통해 어떤 브라우저가 들어오는 지 확인할 수 있다.
+    // 세션 미들웨어가 브라우저한테 텍스트를 보낸다. (서버가 해당 브라우저의 접근을 기억하기 위함)
+    // 서버가 브라우저한테 세션ID를 보내주는 과정.
+    secret: "Hello!",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+app.use(localsMiddleware); // 해당 코드는 app.use(sesseion({...})) 코드 아래에 있어야한다.
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
