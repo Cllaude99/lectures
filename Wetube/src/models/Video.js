@@ -12,5 +12,13 @@ const videoSchema = new mongoose.Schema({
   },
 });
 
+// static 함수를 만들어주는 과정 (사용하기 위해서는 '모델명.함수이름'의 형태로 사용한다.)
+videoSchema.static("formatHashtags", function (hashtags) {
+  return hashtags
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word : `#${word}`));
+});
+
+// 모델을 생성하는 부분
 const Video = mongoose.model("Video", videoSchema); // mongoose.model(모델 이름, 모델 스키마)
 export default Video;
