@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
+import MongoStore from "connect-mongo"; // 세션을 DB에 저장하기 위한 용도
 import globalRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
@@ -21,9 +22,10 @@ app.use(
     // 세션 미들웨어를 통해 어떤 브라우저가 들어오는 지 확인할 수 있다.
     // 세션 미들웨어가 브라우저한테 텍스트를 보낸다. (서버가 해당 브라우저의 접근을 기억하기 위함)
     // 서버가 브라우저한테 세션ID를 보내주는 과정.
-    secret: "Hello!",
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.COOKIE_SECRET, // 쿠키에 sign할때 사용하는 string (우리 backend가 쿠키를 줬다는 것을 보여주기 위함)
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.DB_URL }), // 세션을 DB에 저장하기 위한 용도 (sessions라는 컬렉션이 해당 DB에 만들어 지고 여기에 세션이 저장되는 것임)
   })
 );
 app.use(localsMiddleware); // 해당 코드는 app.use(sesseion({...})) 코드 아래에 있어야한다.

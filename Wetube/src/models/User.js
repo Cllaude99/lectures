@@ -3,8 +3,10 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true }, // unique -> mongoose 공식문서에서 SchemaTypes참고
+  avatarUrl: { type: String },
+  socialOnly: { type: Boolean, default: false },
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String },
   name: { type: String, required: true },
   location: { type: String },
 });
