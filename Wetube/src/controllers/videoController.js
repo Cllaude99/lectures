@@ -1,4 +1,5 @@
 import Video from "../models/Video";
+import User from "../models/User";
 
 export const home = async (req, res) => {
   //sort({}) 함수를 통해 찾은 문서들을 정렬할 수 있다. (Query.prototype.sort({})).
@@ -7,26 +8,41 @@ export const home = async (req, res) => {
 };
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
+  const video = await Video.findById(id).populate("owner"); // populate("속성명") 을 통해 실제 속성 명에 있는 값을 해당 모델에 있는 객체로 변환해준다.
   if (!video) {
-    return res.status(404).render("404", { pageTitle: "Video not found." });
+    return res
+      .status(404)
+      .render("404", { pageTitle: "Video not found.", video });
   }
   return res.render("watch", { pageTitle: video.title, video });
 };
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+
   const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
   return res.render("edit", { pageTitle: `Edit ${video.title}`, video });
 };
 export const postEdit = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
   const { id } = req.params;
   const { title, description, hashtags } = req.body;
-  const video = await Video.exists({ _id: id });
+  const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
   }
   await Video.findByIdAndUpdate(id, {
     title,
@@ -40,15 +56,25 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video" });
 };
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
+  const { path: fileUrl } = req.file;
   const { title, description, hashtags } = req.body;
   try {
     // Video.create() 에서 Video모델의 구조에 맞게 만들어 지지 않을 경우 에러를 발생하기 때문에 try-catch로 묶어준다.
     // Video모델 구조에 따라 새로운 document를 만들어 주고 저장하느 과정
-    await Video.create({
+    const newVideo = await Video.create({
       title,
       description,
+      fileUrl,
+      owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
+    const user = await User.findById(_id);
+    user.videos.unshift(newVideo._id);
+    await user.save(); // User.js에 있는 pre("save")안에 있는 함수가 호출되고 여기서 비밀번호가 다시 해싱되기 때문에 User.js에서 pre함수의 수정이 필요!
+
     return res.redirect("/");
   } catch (error) {
     return res.status(400).render("upload", {
@@ -60,7 +86,21 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+  const video = await Video.findById(id);
+  const user = await User.findById(_id);
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   await Video.findByIdAndDelete(id);
+  user.videos.splice(user.videos.indexOf(id), 1);
+  await user.save();
   return res.redirect("/");
 };
 

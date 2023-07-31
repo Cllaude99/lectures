@@ -1,4 +1,5 @@
 import User from "../models/User";
+import Video from "../models/Video";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
@@ -151,9 +152,11 @@ export const postEdit = async (req, res) => {
   const {
     body: { name, email, username, location },
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
+    file,
   } = req;
+
   const findUsername = await User.findOne({ username });
   const findEmail = await User.findOne({ email });
   if (
@@ -168,6 +171,7 @@ export const postEdit = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
+      avatarUrl: file ? file.path : avatarUrl, // 유저한테 이미 아바타URL이 존재하고 edit과정에서 아타바URL을 별도로 수정하지 않을 수 있으므로
       name,
       email,
       username,
@@ -210,5 +214,17 @@ export const postChangePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
+export const see = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+  if (!user) {
+    res.status(404).render("404", { pageTitle: "User not found." });
+  }
+
+  return res.render("users/profile", {
+    pageTitle: user.name,
+    user,
+  });
+};
+
 export const remove = (req, res) => res.send("Remove User");
-export const see = (req, res) => res.send("See User");

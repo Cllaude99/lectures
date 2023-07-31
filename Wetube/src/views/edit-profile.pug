@@ -2,7 +2,10 @@ extends base.pug
 
 block content
   h1=errorMessage
-  form(method="POST")
+  img(src=`/${loggedInUser.avatarUrl}` width="100px" height="100px")
+  form(method="POST" enctype="multipart/form-data")
+    label(for="avatar") Avatar
+    input(type="file" id="avatar" name="avatar" accept="images/*")
     input(name="name" type="text" placeholder="Name" value=loggedInUser.name required)
     input(name="email" type="email" placeholder="Email" value=loggedInUser.email required)
     input(name="username" type="text" placeholder="Username" value=loggedInUser.username required)

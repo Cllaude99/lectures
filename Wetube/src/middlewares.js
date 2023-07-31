@@ -1,3 +1,5 @@
+import multer from "multer";
+
 export const localsMiddleware = (req, res, next) => {
   // 'res.locals.변수이름 = 변수 값' 을 통해 pug와 해당 변수이름을 공유할 수 있다.
   // pug에서는 변수이름 만 사용해서 값을 불러올 수 있다.
@@ -24,3 +26,18 @@ export const publicOnlyMiddleware = (req, res, next) => {
     return res.redirect("/");
   }
 };
+
+// 사용자가 보낸 파일을 uploads폴더에 저장하도록 설정된 미들웨어
+export const avatarUpload = multer({
+  dest: "uploads/avatars/",
+  limits: {
+    fileSize: 3000000,
+  },
+});
+
+export const videoUpload = multer({
+  dest: "uploads/videos/",
+  limits: {
+    fileSize: 10000000,
+  },
+});
