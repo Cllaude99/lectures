@@ -144,6 +144,71 @@ export const logout = (req, res) => {
   req.session.destroy(); // 세션의 속성들을 없애준다.
   return res.redirect("/");
 };
-export const edit = (req, res) => res.send("Edit User");
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+export const postEdit = async (req, res) => {
+  const {
+    body: { name, email, username, location },
+    session: {
+      user: { _id },
+    },
+  } = req;
+  const findUsername = await User.findOne({ username });
+  const findEmail = await User.findOne({ email });
+  if (
+    (findUsername != null && findUsername._id != _id) ||
+    (findEmail != null && findEmail._id != _id)
+  ) {
+    return res.render("edit-profile", {
+      pageTitle: "Edit Profile",
+      errorMessage: "User already exists!",
+    });
+  }
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      email,
+      username,
+      location,
+    },
+    { new: true } // {new: true}가 없으면 findByIdAndUpdate()함수는 수정 전의 결과를 리턴한다.
+  );
+  req.session.user = updatedUser;
+  return res.redirect("/users/edit");
+};
+export const getChangePassword = (req, res) => {
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+  //이 코드(const user = await User.findById(_id))가 필요한 이유는 비밀번호를 변경하고 또 다시 비밀번호를 변경하는 과정이 연달아 일어날 수 있기때문에
+  // 세션을 업데이트 하는 과정이 필요하다 . (세션에서 데이터를 가져와서 업데이트 했으면, 업데이트 된 값을 세션에 반영해주는 것이 필요하다.)
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+  user.password = newPassword;
+  await user.save(); //user.save()과정을 통해 pre("save") 미들웨어가 호출된다.
+  // send notification
+  return res.redirect("/users/logout");
+};
+
 export const remove = (req, res) => res.send("Remove User");
 export const see = (req, res) => res.send("See User");
