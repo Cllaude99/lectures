@@ -3,7 +3,9 @@ import User from "../models/User";
 
 export const home = async (req, res) => {
   //sort({}) 함수를 통해 찾은 문서들을 정렬할 수 있다. (Query.prototype.sort({})).
-  const videos = await Video.find({}).sort({ createdAt: "desc" }); // await을 통해 결과값을database에서 받을 때 까지 기다려 준다. (await은 async함수 안에서만 사용가능)
+  const videos = await Video.find({})
+    .sort({ createdAt: "desc" })
+    .populate("owner"); // await을 통해 결과값을database에서 받을 때 까지 기다려 준다. (await은 async함수 안에서만 사용가능)
   return res.render("home", { pageTitle: "Home", videos }); // return의 용도는 어떤것을 반환하는게 아니라 종료의 의미로 사용됨. (res.render()는 한번만 사용되어야 하기 때문에 이러한 방어적인 코드가 필요하다.)
 };
 export const watch = async (req, res) => {
