@@ -30,6 +30,7 @@ app.use(
 );
 app.use(localsMiddleware); // 해당 코드는 app.use(sesseion({...})) 코드 아래에 있어야한다.
 app.use("/uploads", express.static("uploads")); // 브라우저에 express.static()을 이용하여 폴더를 노출한다. -> 즉 "/uploads" 인 경로에 대한 접근에 대해서 uploads폴더에 대한 접근을 허용한다.
+app.use("/static", express.static("assets"));
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
