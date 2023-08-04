@@ -10,7 +10,6 @@ const videoContainer = document.getElementById("videoContainer");
 const videoControls = document.getElementById("videoControls");
 
 let controlsTimeout = null;
-let controlsMovementTimeout = null;
 let volumeValue = 0.5;
 video.volume = volumeValue;
 
@@ -104,7 +103,6 @@ const handleMouseMove = () => {
     controlsTimeout = null;
   }
   videoControls.classList.add("showing");
-  controlsMovementTimeout = setTimeout(hideControls, 3000);
   controlsTimeout = setTimeout(hideControls, 3000);
 };
 
