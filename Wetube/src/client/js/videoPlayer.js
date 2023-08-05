@@ -57,7 +57,6 @@ const handleVolumeByChange = (event) => {
   const {
     target: { value },
   } = event;
-
   if (value == 0) {
     video.muted = true;
     muteBtnIcon.classList = video.muted
