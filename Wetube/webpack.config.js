@@ -5,6 +5,7 @@ module.exports = {
     // 우리가 변경하고자 하는 파일 (최신 자바스크립트 문법)
     main: "./src/client/js/main.js",
     videoPlayer: "./src/client/js/videoPlayer.js",
+    recorder: "./src/client/js/recorder.js",
   },
   plugins: [
     new MiniCssExtractPlugin({
