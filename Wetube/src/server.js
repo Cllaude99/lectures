@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
+import flash from "express-flash";
 import MongoStore from "connect-mongo"; // 세션을 DB에 저장하기 위한 용도
 import globalRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
@@ -34,6 +35,7 @@ app.use(
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }), // 세션을 DB에 저장하기 위한 용도 (sessions라는 컬렉션이 해당 DB에 만들어 지고 여기에 세션이 저장되는 것임)
   })
 );
+app.use(flash());
 app.use(localsMiddleware); // 해당 코드는 app.use(sesseion({...})) 코드 아래에 있어야한다.
 app.use("/uploads", express.static("uploads")); // 브라우저에 express.static()을 이용하여 폴더를 노출한다. -> 즉 "/uploads" 인 경로에 대한 접근에 대해서 uploads폴더에 대한 접근을 허용한다.
 app.use("/static", express.static("assets"));

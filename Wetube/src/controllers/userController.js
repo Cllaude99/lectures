@@ -115,7 +115,7 @@ export const finishGithubLogin = async (req, res) => {
       })
     ).json();
     const emailObj = emailData.find(
-      email => email.primary === true && email.verified === true
+      (email) => email.primary === true && email.verified === true
     );
     if (!emailObj) {
       // set notification
@@ -143,6 +143,7 @@ export const finishGithubLogin = async (req, res) => {
 };
 export const logout = (req, res) => {
   req.session.destroy(); // 세션의 속성들을 없애준다.
+  req.flash("info", "Bye Bye");
   return res.redirect("/");
 };
 export const getEdit = (req, res) => {
@@ -183,6 +184,10 @@ export const postEdit = async (req, res) => {
   return res.redirect("/users/edit");
 };
 export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    req.flash("error", "Can't change password.");
+    return res.redirect("/");
+  }
   return res.render("users/change-password", { pageTitle: "Change Password" });
 };
 export const postChangePassword = async (req, res) => {
@@ -210,6 +215,7 @@ export const postChangePassword = async (req, res) => {
   }
   user.password = newPassword;
   await user.save(); //user.save()과정을 통해 pre("save") 미들웨어가 호출된다.
+  req.flash("info", "Password updated");
   // send notification
   return res.redirect("/users/logout");
 };
