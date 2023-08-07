@@ -142,7 +142,9 @@ export const finishGithubLogin = async (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  req.session.destroy(); // 세션의 속성들을 없애준다.
+  //req.session.destroy(); // 세션의 속성들을 없애준다.
+  req.session.user = null;
+  req.session.loggedIn = false;
   req.flash("info", "Bye Bye");
   return res.redirect("/");
 };
