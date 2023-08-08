@@ -21,8 +21,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use(logger);
-app.use(express.json()); // req.body값을 받을 수 있도록 다음과 같은 설정이 필요하다.
 app.use(express.urlencoded({ extended: true })); //form의 value 값을 자바스크립트 object값으로 불러오기 위해 다음과 같은 설정이 필요하다.
+app.use(express.json()); // req.body값을 받을 수 있도록 다음과 같은 설정이 필요하다. (string값을 받아서 JSON형태로 변경해서 보여준다.)
 
 app.use(
   session({
