@@ -11,6 +11,9 @@ const videoSchema = new mongoose.Schema({
   meta: {
     views: { type: Number, default: 0 },
   },
+  comments: [
+    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Comment" },
+  ],
   // owner에서 ref속성의 의미 : owner의 type이 ObjectId인데,
   // 이는 해당 DB에 있는 여러개의 모델이 될 수 있으므로 ref: '모델이름'을 적어주어서
   // ObjectId의 모델을 한정하는 역할을 한다.
