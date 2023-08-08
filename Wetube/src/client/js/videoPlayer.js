@@ -109,14 +109,14 @@ const handleMouseLeave = () => {
 };
 
 const handleKeyboard = (event) => {
-  if (event.keyCode == 32) {
+  if (event.target == document.body && event.keyCode == 32) {
     event.preventDefault();
     handlePlayClick();
-  } else if (event.keyCode == 77) {
+  } else if (event.target == document.body && event.keyCode == 77) {
     handleMuteClick();
-  } else if (event.keyCode == 39) {
+  } else if (event.target == document.body && event.keyCode == 39) {
     video.currentTime += 5;
-  } else if (event.keyCode == 37) {
+  } else if (event.target == document.body && event.keyCode == 37) {
     video.currentTime -= 5;
   }
 };
