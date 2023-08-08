@@ -1,5 +1,6 @@
 import Video from "../models/Video";
 import User from "../models/User";
+import Comment from "../models/Comment";
 
 export const home = async (req, res) => {
   //sort({}) 함수를 통해 찾은 문서들을 정렬할 수 있다. (Query.prototype.sort({})).
@@ -10,7 +11,8 @@ export const home = async (req, res) => {
 };
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id).populate("owner"); // populate("속성명") 을 통해 실제 속성 명에 있는 값을 해당 모델에 있는 객체로 변환해준다.
+  const video = await Video.findById(id).populate("owner").populate("comments"); // populate("속성명") 을 통해 실제 속성 명에 있는 값을 해당 모델에 있는 객체로 변환해준다.
+  console.log(video);
   if (!video) {
     return res
       .status(404)
@@ -131,8 +133,24 @@ export const registerView = async (req, res) => {
   return res.sendStatus(200);
 };
 
-export const createComment = (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-  res.end();
+export const createComment = async (req, res) => {
+  const {
+    session: { user },
+    body: { text },
+    params: { id },
+  } = req;
+
+  const video = await Video.findById(id);
+
+  if (!video) {
+    return res.sendStatus(404);
+  }
+  const comment = await Comment.create({
+    text,
+    owner: user._id,
+    video: id,
+  });
+  video.comments.push(comment._id);
+  await video.save();
+  return res.sendStatus(201);
 };
