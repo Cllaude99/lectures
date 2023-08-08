@@ -12,7 +12,6 @@ export const home = async (req, res) => {
 export const watch = async (req, res) => {
   const { id } = req.params;
   const video = await Video.findById(id).populate("owner").populate("comments"); // populate("속성명") 을 통해 실제 속성 명에 있는 값을 해당 모델에 있는 객체로 변환해준다.
-  console.log(video);
   if (!video) {
     return res
       .status(404)
