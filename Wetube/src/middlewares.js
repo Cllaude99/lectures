@@ -1,4 +1,37 @@
 import multer from "multer";
+import multers3 from "multer-s3";
+import aws from "aws-sdk";
+
+const s3 = new aws.S3({
+  credentials: {
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET,
+  },
+});
+
+const isFlyio = process.env.NODE_ENV === "production";
+
+const s3ImageUploader = multers3({
+  s3: s3,
+  bucket: "cllaudewetube",
+  acl: "public-read",
+  key: function (request, file, ab_callback) {
+    const newFileName = Date.now() + "-" + file.originalname;
+    const fullPath = "images/" + newFileName;
+    ab_callback(null, fullPath);
+  },
+});
+
+const s3VideoUploader = multers3({
+  s3: s3,
+  bucket: "cllaudewetube",
+  acl: "public-read",
+  key: function (request, file, ab_callback) {
+    const newFileName = Date.now() + "-" + file.originalname;
+    const fullPath = "videos/" + newFileName;
+    ab_callback(null, fullPath);
+  },
+});
 
 export const localsMiddleware = (req, res, next) => {
   // 'res.locals.변수이름 = 변수 값' 을 통해 pug와 해당 변수이름을 공유할 수 있다.
@@ -6,6 +39,7 @@ export const localsMiddleware = (req, res, next) => {
   res.locals.loggedIn = Boolean(req.session.loggedIn);
   res.locals.loggedInUser = req.session.user || {};
   res.locals.siteName = "Wetube";
+  res.locals.isFlyio = isFlyio;
   next(); // 미들웨어이므로 next() 필수 !!
 };
 
@@ -35,6 +69,7 @@ export const avatarUpload = multer({
   limits: {
     fileSize: 3000000,
   },
+  storage: isFlyio ? s3ImageUploader : undefined,
 });
 
 export const videoUpload = multer({
@@ -42,4 +77,5 @@ export const videoUpload = multer({
   limits: {
     fileSize: 10000000,
   },
+  storage: isFlyio ? s3VideoUploader : undefined,
 });
