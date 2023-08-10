@@ -66,17 +66,14 @@ export const postUpload = async (req, res) => {
   } = req.session;
   const { video, thumb } = req.files;
   const { title, description, hashtags } = req.body;
-  const isFlyio = process.env.NODE_ENV === "production";
   try {
     // Video.create() 에서 Video모델의 구조에 맞게 만들어 지지 않을 경우 에러를 발생하기 때문에 try-catch로 묶어준다.
     // Video모델 구조에 따라 새로운 document를 만들어 주고 저장하느 과정
     const newVideo = await Video.create({
       title,
       description,
-      fileUrl: isFlyio ? video[0].location : video[0].path,
-      thumbUrl: isFlyio
-        ? thumb[0].location
-        : thumb[0].path.replace(/[\\]/g, "/"),
+      fileUrl: video[0].path,
+      thumbUrl: thumb[0].path.replace(/[\\]/g, "/"),
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });

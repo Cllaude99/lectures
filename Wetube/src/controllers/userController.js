@@ -160,8 +160,6 @@ export const postEdit = async (req, res) => {
     file,
   } = req;
 
-  const isFlyio = process.env.NODE_ENV === "production";
-
   const findUsername = await User.findOne({ username });
   const findEmail = await User.findOne({ email });
   if (
@@ -176,7 +174,7 @@ export const postEdit = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
-      avatarUrl: file ? (isFlyio ? file.location : file.path) : avatarUrl, // 유저한테 이미 아바타URL이 존재하고 edit과정에서 아타바URL을 별도로 수정하지 않을 수 있으므로
+      avatarUrl: file ? file.path : avatarUrl, // 유저한테 이미 아바타URL이 존재하고 edit과정에서 아타바URL을 별도로 수정하지 않을 수 있으므로
       name,
       email,
       username,
