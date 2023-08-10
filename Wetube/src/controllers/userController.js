@@ -171,10 +171,13 @@ export const postEdit = async (req, res) => {
       errorMessage: "User already exists!",
     });
   }
+
+  const isFlyio = process.env.NODE_ENV === "production";
+
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
-      avatarUrl: file ? file.path : avatarUrl, // 유저한테 이미 아바타URL이 존재하고 edit과정에서 아타바URL을 별도로 수정하지 않을 수 있으므로
+      avatarUrl: file ? (isFlyio ? file.location : file.path) : avatarUrl, // 유저한테 이미 아바타URL이 존재하고 edit과정에서 아타바URL을 별도로 수정하지 않을 수 있으므로
       name,
       email,
       username,
