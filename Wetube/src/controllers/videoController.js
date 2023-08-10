@@ -74,7 +74,9 @@ export const postUpload = async (req, res) => {
       title,
       description,
       fileUrl: isFlyio ? video[0].location : video[0].path,
-      thumbUrl: isFlyio ? thumb[0].location : thumb[0].path,
+      thumbUrl: isFlyio
+        ? thumb[0].location
+        : thumb[0].path.replace(/[\\]/g, "/"),
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
