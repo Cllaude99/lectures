@@ -1,6 +1,12 @@
 import styled from "styled-components";
 import axios from "axios";
-import { useParams, useLocation } from "react-router-dom";
+import {
+  useParams,
+  useLocation,
+  Outlet,
+  Link,
+  useMatch,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Container = styled.div`
@@ -25,7 +31,54 @@ const Loader = styled.span`
   text-align: center;
   display: block;
 `;
-export interface Links {
+
+const Overview = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 10px;
+`;
+
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  span:first-child {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+`;
+
+const Description = styled.p`
+  margin: 20px 0px;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+`;
+interface Links {
   explorer: string[];
   facebook: string[];
   reddit: string[];
@@ -33,36 +86,36 @@ export interface Links {
   website: string[];
   youtube: string[];
 }
-export interface LinksExtended {
+interface LinksExtended {
   url: string;
   type: string;
   stats?: Stats;
 }
-export interface Stats {
+interface Stats {
   subscribers?: number;
   contributors?: number;
   stars?: number;
   followers?: number;
 }
-export interface Tag {
+interface Tag {
   id: string;
   name: string;
   coin_counter: number;
   ico_counter: number;
 }
-export interface Team {
+interface Team {
   id: string;
   name: string;
   position: string;
 }
-export interface Whitepaper {
+interface Whitepaper {
   link: string;
   thumbnail: string;
 }
-export interface Quotes {
+interface Quotes {
   USD: Usd;
 }
-export interface Usd {
+interface Usd {
   price: number;
   volume_24h: number;
   volume_24h_change_24h: number;
@@ -127,6 +180,8 @@ const Coin = () => {
   const { state } = useLocation();
   const [info, setInfo] = useState<InfoData>();
   const [priceInfo, setPriceInfo] = useState<PriceData>();
+  const matchPriceTab = useMatch("/:coinId/price");
+  const matchChartTaB = useMatch("/:coinId/chart");
 
   useEffect(() => {
     (async () => {
@@ -138,14 +193,56 @@ const Coin = () => {
       ).data;
       setInfo(infoData);
       setPriceInfo(priceData);
+      setLoading(false);
     })();
   }, [coinId]);
   return (
     <Container>
       <Header>
-        <Title> {state?.name || `Loading`}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+        </Title>
       </Header>
-      {loading ? <Loader>Loading...</Loader> : null}
+      {loading ? (
+        <Loader>Loading...</Loader>
+      ) : (
+        <>
+          <Overview>
+            <OverviewItem>
+              <span>Rank:</span>
+              <span>{info?.rank}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Symbol:</span>
+              <span>${info?.symbol}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Open Source</span>
+              <span>{info?.open_source ? "Yes" : "No"}</span>
+            </OverviewItem>
+          </Overview>
+          <Description>{info?.description}</Description>
+          <Overview>
+            <OverviewItem>
+              <span>Total Suply:</span>
+              <span>{priceInfo?.total_supply}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Max Supply:</span>
+              <span>{priceInfo?.max_supply}</span>
+            </OverviewItem>
+          </Overview>
+          <Tabs>
+            <Tab isActive={matchPriceTab !== null}>
+              <Link to="price">Price</Link>
+            </Tab>
+            <Tab isActive={matchChartTaB !== null}>
+              <Link to="chart">Chart</Link>
+            </Tab>
+          </Tabs>
+          <Outlet />
+        </>
+      )}
     </Container>
   );
 };
