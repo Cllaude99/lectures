@@ -233,7 +233,7 @@ const Coin = () => {
               <Link to="chart">Chart</Link>
             </Tab>
           </Tabs>
-          <Outlet />
+          <Outlet context={{ coinId }} />
         </>
       )}
     </Container>
