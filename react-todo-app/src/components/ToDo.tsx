@@ -1,4 +1,4 @@
-import { IToDO, toDoState } from "../atoms";
+import { Categories, IToDO, toDoState } from "../atoms";
 import { useSetRecoilState } from "recoil";
 
 const ToDo = ({ text, category, id }: IToDO) => {
@@ -9,30 +9,34 @@ const ToDo = ({ text, category, id }: IToDO) => {
     } = event;
     setToDos((prevToDos) => {
       const targetIndex = prevToDos.findIndex((toDo) => toDo.id === id);
-      const newToDo: IToDO = { text, id, category: name as IToDO["category"] };
+      const newToDo: IToDO = { text, id, category: name as Categories };
       const newToDos = [...prevToDos];
       newToDos.splice(targetIndex, 1, newToDo);
       return newToDos;
     });
   };
+  const handleDelete = (id: number) => {
+    setToDos((prevToDos) => prevToDos.filter((toDo) => toDo.id !== id));
+  };
   return (
     <li>
       <span>{text}</span>
-      {category !== "DOING" && (
-        <button name="DOING" onClick={onClick}>
+      {category !== Categories.DOING && (
+        <button name={Categories.DOING} onClick={onClick}>
           Doing
         </button>
       )}
-      {category !== "TO_DO" && (
-        <button name="TO_DO" onClick={onClick}>
+      {category !== Categories.TO_DO && (
+        <button name={Categories.TO_DO} onClick={onClick}>
           To Do
         </button>
       )}
-      {category !== "DONE" && (
-        <button name="DONE" onClick={onClick}>
+      {category !== Categories.DONE && (
+        <button name={Categories.DONE} onClick={onClick}>
           Done
         </button>
       )}
+      <button onClick={() => handleDelete(id)}>Delete</button>
     </li>
   );
 };
