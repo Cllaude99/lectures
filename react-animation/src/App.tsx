@@ -1,5 +1,6 @@
 import { styled } from "styled-components";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -8,54 +9,44 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
+const BiggerBox = styled.div`
+  width: 600px;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
 const Box = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
   width: 200px;
   height: 200px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-`;
-
-const Circle = styled(motion.div)`
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  background-color: white;
-  height: 70px;
-  width: 70px;
+  background-color: rgba(255, 255, 255, 1);
   border-radius: 40px;
-  place-self: center;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
 const boxVariants = {
-  start: { opacity: 0, scale: 0.5 },
-  end: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      type: "spring",
-      duration: 0.5,
-      bounce: 0.5,
-      delayChildren: 0.5,
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const circleVariants = {
-  start: { opacity: 0, y: 10 },
-  end: { opacity: 1, y: 0 },
+  hover: { scale: 1.5, rotateZ: 90 },
+  click: { scale: 1, borderRadius: "100px" },
 };
 
 function App() {
+  const bigggerBoxRef = useRef<HTMLDivElement>(null);
+
   return (
     <Wrapper>
-      <Box variants={boxVariants} initial="start" animate="end">
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-      </Box>
+      <BiggerBox ref={bigggerBoxRef}>
+        <Box
+          variants={boxVariants}
+          whileHover="hover"
+          whileTap="click"
+          drag
+          dragConstraints={bigggerBoxRef}
+          dragSnapToOrigin
+        />
+      </BiggerBox>
     </Wrapper>
   );
 }
