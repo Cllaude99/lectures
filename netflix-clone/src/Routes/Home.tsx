@@ -59,7 +59,6 @@ const Box = styled(motion.div)<{ bgphoto: string }>`
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
-  color: red;
   font-size: 64px;
   cursor: pointer;
   &:first-child {
