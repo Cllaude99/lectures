@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { IGetMoviesResult, getMovies } from "../api";
 import { styled } from "styled-components";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { makeImagePath } from "./utils";
 import { useState } from "react";
+import { useMatch, useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   background: black;
@@ -60,6 +61,7 @@ const Box = styled(motion.div)<{ bgphoto: string }>`
   background-position: center center;
   color: red;
   font-size: 64px;
+  cursor: pointer;
   &:first-child {
     transform-origin: center left;
   }
@@ -82,6 +84,44 @@ const Info = styled(motion.div)`
   color: white;
 `;
 
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+const BigMovie = styled(motion.div)<{ scrolly: number }>`
+  position: absolute;
+  width: 40vw;
+  height: 80vh;
+
+  top: ${(props) => props.scrolly + 150}px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: ${(props) => props.theme.black.lighter};
+  border-radius: 15px;
+  overflow: hidden;
+`;
+
+const BigCover = styled.div`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 400px;
+`;
+
+const BigTitle = styled.h3`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 10px;
+  font-size: 36px;
+  position: relative;
+  top: -60px;
+`;
+
 const boxVariants = {
   initial: { scale: 1 },
   hover: {
@@ -101,6 +141,9 @@ const infoVariants = {
 const offset = 6;
 
 export const Home = () => {
+  const navigate = useNavigate();
+  const bigMovieMatch = useMatch("/movies/:id");
+  const { scrollY } = useScroll();
   const { isLoading, data } = useQuery<IGetMoviesResult>(
     ["movies", "nowplaying"],
     getMovies
@@ -120,6 +163,15 @@ export const Home = () => {
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
   window.addEventListener("resize", () => setScreenWidth(window.innerWidth));
+  const onBoxClicked = (movieId: number) => {
+    navigate(`/movies/${movieId}`);
+  };
+  const onOverlayClicked = () => {
+    navigate(-1);
+  };
+  const clickedMovie =
+    bigMovieMatch?.params.id &&
+    data?.results.find((movie) => movie.id + "" === bigMovieMatch.params.id);
 
   return (
     <Wrapper>
@@ -149,6 +201,7 @@ export const Home = () => {
                   .map((movie) => (
                     <Box
                       key={movie.id}
+                      layoutId={movie.id + ""}
                       variants={boxVariants}
                       bgphoto={makeImagePath(
                         movie.backdrop_path || movie.poster_path
@@ -156,6 +209,7 @@ export const Home = () => {
                       initial="initial"
                       whileHover="hover"
                       transition={{ type: "tween" }}
+                      onClick={() => onBoxClicked(movie.id)}
                     >
                       <Info variants={infoVariants}>
                         <h4>{movie.title}</h4>
@@ -165,6 +219,34 @@ export const Home = () => {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {bigMovieMatch ? (
+              <>
+                <Overlay
+                  onClick={onOverlayClicked}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                />
+                <BigMovie
+                  layoutId={bigMovieMatch.params.id}
+                  scrolly={scrollY.get()}
+                >
+                  {clickedMovie && (
+                    <>
+                      <BigCover
+                        style={{
+                          backgroundImage: `linear-gradient(to top ,black, transparent), url(${makeImagePath(
+                            clickedMovie.backdrop_path
+                          )})`,
+                        }}
+                      ></BigCover>
+                      <BigTitle>{clickedMovie.title}</BigTitle>
+                    </>
+                  )}
+                </BigMovie>
+              </>
+            ) : null}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>
