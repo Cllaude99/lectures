@@ -111,15 +111,28 @@ const BigCover = styled.div`
   width: 100%;
   background-size: cover;
   background-position: center center;
-  height: 400px;
+  height: 35vh;
+`;
+
+const BigInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
 `;
 
 const BigTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
   padding: 10px;
   font-size: 36px;
-  position: relative;
-  top: -60px;
+  position: absolute;
+  top: -100px;
+`;
+
+const BigOverview = styled.p`
+  padding: 15px;
+  position: absolute;
+  top: -60;
+  color: ${(props) => props.theme.white.lighter};
 `;
 
 const boxVariants = {
@@ -240,7 +253,10 @@ export const Home = () => {
                           )})`,
                         }}
                       ></BigCover>
-                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigInfoWrapper>
+                        <BigTitle>{clickedMovie.title}</BigTitle>
+                        <BigOverview>{clickedMovie.overview}</BigOverview>
+                      </BigInfoWrapper>
                     </>
                   )}
                 </BigMovie>
