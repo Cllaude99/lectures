@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, About } from "./screens";
+import { Home, About, User, Followers } from "./screens";
 import { Header } from "./components/Header";
+import NotFound from "./screens/NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,17 @@ export const router = createBrowserRouter([
         path: "about",
         element: <About />,
       },
+      {
+        path: "users/:userId",
+        element: <User />,
+        children: [
+          {
+            path: "followers",
+            element: <Followers />,
+          },
+        ],
+      },
     ],
+    errorElement: <NotFound />,
   },
 ]);
