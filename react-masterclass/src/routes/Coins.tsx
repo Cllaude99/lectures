@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -22,9 +23,10 @@ const Coin = styled.li`
   border-radius: 15px;
   margin-bottom: 10px;
   a {
+    display: flex;
+    align-items: center;
     padding: 20px;
     transition: color 0.2s ease-in;
-    display: block;
   }
   &:hover {
     a {
@@ -40,7 +42,11 @@ const Loader = styled.span`
   display: block;
   text-align: center;
 `;
-
+const Img = styled.img`
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+`;
 interface ICoin {
   id: string;
   name: string;
@@ -74,7 +80,13 @@ export const Coins = () => {
         <CoinsList>
           {coins.map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`}>{coin.name} &rarr;</Link>
+              <Link to={`/${coin.id}`} state={{ name: coin.name }}>
+                <Img
+                  src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
+                  alt="coinLogo"
+                />
+                {coin.name} &rarr;
+              </Link>
             </Coin>
           ))}
         </CoinsList>
