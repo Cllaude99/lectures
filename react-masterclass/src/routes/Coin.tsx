@@ -1,7 +1,13 @@
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useMatch,
+  useParams,
+} from "react-router-dom";
 import styled from "styled-components";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useQuery } from "react-query";
+import { fetchCoinInfo, fetchCoinTickers } from "./api";
 
 interface Links {
   explorer: string[];
@@ -112,7 +118,7 @@ const Header = styled.header`
 `;
 const Title = styled.h1`
   font-size: 48px;
-  color: ${(props) => props.theme.accentColor};
+  color: ${props => props.theme.accentColor};
 `;
 const Loader = styled.span`
   display: block;
@@ -139,28 +145,41 @@ const OverviewItem = styled.div`
 const Description = styled.p`
   margin: 20px 0px;
 `;
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${props =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+`;
 
 export const Coin = () => {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams();
   const { state } = useLocation();
-  const [infoData, setInfoData] = useState<IInfoData>();
-  const [priceInfo, setPriceInfo] = useState<IPriceData>();
-
-  useEffect(() => {
-    (async () => {
-      const { data: infoData } = await axios(
-        `https://api.coinpaprika.com/v1/coins/${coinId}`
-      );
-      const { data: priceData } = await axios(
-        `https://api.coinpaprika.com/v1/tickers/${coinId}`
-      );
-      setInfoData(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
-
+  const priceMatch = useMatch(`/${coinId}/price`);
+  const chartMatch = useMatch(`/${coinId}/chart`);
+  const { data: infoData, isLoading: infoLoading } = useQuery<IInfoData>(
+    ["infoData", coinId],
+    () => fetchCoinInfo(coinId!)
+  );
+  const { data: priceInfo, isLoading: priceInfoLoading } = useQuery<IPriceData>(
+    ["priceData", coinId],
+    () => fetchCoinTickers(coinId!)
+  );
+  const loading = infoLoading || priceInfoLoading;
   return (
     <Container>
       <Header>
@@ -197,6 +216,15 @@ export const Coin = () => {
               <span>{priceInfo?.max_supply}</span>
             </OverviewItem>
           </Overview>
+          <Tabs>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+
           <Outlet />
         </>
       )}
