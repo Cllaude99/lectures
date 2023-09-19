@@ -8,6 +8,7 @@ import {
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "./api";
+import { Helmet } from "react-helmet-async";
 
 interface Links {
   explorer: string[];
@@ -118,7 +119,7 @@ const Header = styled.header`
 `;
 const Title = styled.h1`
   font-size: 48px;
-  color: ${(props) => props.theme.accentColor};
+  color: ${props => props.theme.accentColor};
 `;
 const Loader = styled.span`
   display: block;
@@ -159,7 +160,7 @@ const Tab = styled.span<{ isActive: boolean }>`
   background-color: rgba(0, 0, 0, 0.5);
   padding: 7px 0px;
   border-radius: 10px;
-  color: ${(props) =>
+  color: ${props =>
     props.isActive ? props.theme.accentColor : props.theme.textColor};
   a {
     display: block;
@@ -177,11 +178,17 @@ export const Coin = () => {
   );
   const { data: priceInfo, isLoading: priceInfoLoading } = useQuery<IPriceData>(
     ["priceData", coinId],
-    () => fetchCoinTickers(coinId!)
+    () => fetchCoinTickers(coinId!),
+    {
+      refetchInterval: 5000,
+    }
   );
   const loading = infoLoading || priceInfoLoading;
   return (
     <Container>
+      <Helmet>
+        <title>{coinId}</title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
@@ -201,8 +208,8 @@ export const Coin = () => {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>{priceInfo?.quotes.USD.price.toFixed(2)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
