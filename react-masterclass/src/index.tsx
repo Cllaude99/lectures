@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
-import { theme } from "./theme";
+import { darkTheme, lightTheme } from "./theme";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./Router";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -76,7 +76,7 @@ root.render(
   <React.StrictMode>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={lightTheme}>
           <GlobalStyle />
           <RouterProvider router={router} />
         </ThemeProvider>

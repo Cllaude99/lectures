@@ -209,7 +209,7 @@ export const Coin = () => {
             </OverviewItem>
             <OverviewItem>
               <span>Price:</span>
-              <span>{priceInfo?.quotes.USD.price.toFixed(2)}</span>
+              <span>{priceInfo?.quotes?.USD?.price?.toFixed(2)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>

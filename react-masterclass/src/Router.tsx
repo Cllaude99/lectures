@@ -3,23 +3,30 @@ import Coin from "./routes/Coin";
 import Coins from "./routes/Coins";
 import Price from "./routes/Price";
 import Chart from "./routes/Chart";
+import App from "./App";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Coins />,
-  },
-  {
-    path: "/:coinId",
-    element: <Coin />,
+    element: <App />,
     children: [
       {
-        path: "price",
-        element: <Price />,
+        index: true,
+        element: <Coins />,
       },
       {
-        path: "chart",
-        element: <Chart />,
+        path: "/:coinId",
+        element: <Coin />,
+        children: [
+          {
+            path: "price",
+            element: <Price />,
+          },
+          {
+            path: "chart",
+            element: <Chart />,
+          },
+        ],
       },
     ],
   },
