@@ -1,86 +1,83 @@
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from "react-beautiful-dnd";
+import styled from "styled-components";
 import { useRecoilState } from "recoil";
-import { styled } from "styled-components";
 import { toDoState } from "./atom";
-import Board from "./Components/Board";
-import { useForm } from "react-hook-form";
 
 const Wrapper = styled.div`
   display: flex;
-  margin: 0 auto;
-  width: 100vw;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-`;
-const Boards = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-width: 480px;
   width: 100%;
-  gap: 10px;
+  height: 100vh;
+  margin: 0 auto;
 `;
 
-function App() {
+const Boards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  width: 100%;
+`;
+
+const Board = styled.div`
+  padding: 20px 10px;
+  padding-top: 30px;
+  background-color: ${props => props.theme.boardColor};
+  border-radius: 5px;
+  min-height: 200px;
+`;
+
+const Card = styled.div`
+  margin-bottom: 5px;
+  border-radius: 5px;
+  padding: 10px 10px;
+  background-color: ${props => props.theme.cardColor};
+`;
+
+const App = () => {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const { register, handleSubmit, setValue } = useForm<{ boardName: string }>();
+
   const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
     if (!destination) return;
-    if (destination.droppableId === source.droppableId) {
-      setToDos(prevToDos => {
-        const boardCopy = [...prevToDos[source.droppableId]];
-        const taskObj = boardCopy[source.index];
-
-        boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination.index, 0, taskObj);
-        return {
-          ...prevToDos,
-          [source.droppableId]: boardCopy,
-        };
-      });
-    }
-    if (destination.droppableId !== source.droppableId) {
-      setToDos(prevToDos => {
-        const sourceBoard = [...prevToDos[source.droppableId]];
-        const taskObj = sourceBoard[source.index];
-        const targetBoard = [...prevToDos[destination.droppableId]];
-        sourceBoard.splice(source.index, 1);
-        targetBoard.splice(destination.index, 0, taskObj);
-        return {
-          ...prevToDos,
-          [source.droppableId]: sourceBoard,
-          [destination.droppableId]: targetBoard,
-        };
-      });
-    }
-  };
-  const onValid = ({ boardName }: { boardName: string }) => {
-    setToDos(prevToDos => {
-      return {
-        ...prevToDos,
-        [boardName]: [],
-      };
+    setToDos(oldToDos => {
+      const copyToDos = [...oldToDos];
+      copyToDos.splice(source.index, 1);
+      copyToDos.splice(destination?.index, 0, draggableId);
+      return copyToDos;
     });
-    setValue("boardName", "");
   };
-
   return (
-    <>
-      <form onSubmit={handleSubmit(onValid)}>
-        <input {...register("boardName")} />
-        <input type="submit" value="Create Board" />
-      </form>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Wrapper>
-          <Boards>
-            {Object.keys(toDos).map(boardId => (
-              <Board key={boardId} boardId={boardId} toDos={toDos[boardId]} />
-            ))}
-          </Boards>
-        </Wrapper>
-      </DragDropContext>
-    </>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Wrapper>
+        <Boards>
+          <Droppable droppableId="one">
+            {provided => (
+              <Board ref={provided.innerRef} {...provided.droppableProps}>
+                {toDos.map((toDo, index) => (
+                  <Draggable key={toDo} draggableId={toDo} index={index}>
+                    {provided => (
+                      <Card
+                        ref={provided.innerRef}
+                        {...provided.dragHandleProps}
+                        {...provided.draggableProps}
+                      >
+                        {toDo}
+                      </Card>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </Board>
+            )}
+          </Droppable>
+        </Boards>
+      </Wrapper>
+    </DragDropContext>
   );
-}
-
+};
 export default App;
