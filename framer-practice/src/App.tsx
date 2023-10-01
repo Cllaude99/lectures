@@ -15,45 +15,25 @@ const Box = styled(motion.div)`
   width: 200px;
   height: 200px;
   border-radius: 40px;
-  background-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) 10px 20px rgba(0, 0, 0, 0.06);
-`;
-
-const Circle = styled(motion.div)`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
   background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1) 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
 function App() {
   const boxVariants = {
-    initial: { opacity: 0, scale: 0 },
-    animate: {
-      opacity: 1,
-      scale: 1,
-      transition: { type: "spring", delayChildren: 0.5, staggerChildren: 0.2 },
-    },
-  };
-  const circleVariants = {
-    initial: { y: 20, opacity: 0 },
-    animate: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-      },
-    },
+    hover: { scale: 1.5, rotateZ: "90deg" },
+    tap: { scale: 1, borderRadius: "100px" },
   };
 
   return (
     <Wrapper>
-      <Box variants={boxVariants} initial="initial" animate="animate">
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-        <Circle variants={circleVariants} />
-      </Box>
+      <Box
+        drag
+        dragSnapToOrigin
+        variants={boxVariants}
+        whileHover="hover"
+        whileTap="tap"
+      />
     </Wrapper>
   );
 }
