@@ -26,35 +26,50 @@ const Box = styled(motion.div)`
 `;
 
 const boxVariants = {
-  initial: { opacity: 0, scale: 0 },
-  animate: {
+  initial: (isForward: boolean) => ({
+    opacity: 0,
+    scale: 0,
+    x: isForward ? 600 : -600,
+  }),
+  animate: (isForward: boolean) => ({
     opacity: 1,
     scale: 1,
-    transition: { type: "spring", duration: 1 },
-  },
-  leave: { scale: 0, opacity: 0 },
+    x: 0,
+    transition: { type: "ease", duration: 1 },
+  }),
+  leave: (isForward: boolean) => ({
+    scale: 0,
+    opacity: 0,
+    x: isForward ? -600 : 600,
+  }),
 };
 
 function App() {
-  const [number, setNumber] = useState(0);
+  const [number, setNumber] = useState(1);
+  const [isForward, setForward] = useState(true);
+
+  const prevClick = () => {
+    setNumber((prev) => (prev === 1 ? 1 : prev - 1));
+    setForward(false);
+  };
+  const nextClick = () => {
+    setNumber((prev) => (prev === 10 ? 10 : prev + 1));
+    setForward(true);
+  };
+
   return (
     <Wrapper>
       <span>
-        <button onClick={() => setNumber(prev => (prev === 1 ? 1 : prev - 1))}>
-          prev
-        </button>
-        <button
-          onClick={() => setNumber(prev => (prev === 10 ? 10 : prev + 1))}
-        >
-          next
-        </button>{" "}
+        <button onClick={prevClick}>prev</button>
+        <button onClick={nextClick}>next</button>{" "}
       </span>
       <AnimatePresence>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i =>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) =>
           i === number ? (
             <Box
               key={i}
               variants={boxVariants}
+              custom={isForward}
               initial="initial"
               animate="animate"
               exit="leave"
