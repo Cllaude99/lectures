@@ -18,12 +18,11 @@ const Col = styled.div`
   display: flex;
   align-items: center;
 `;
-
 const Logo = styled(motion.svg)`
   margin-right: 50px;
   width: 95px;
   height: 25px;
-  fill: ${props => props.theme.red};
+  fill: ${(props) => props.theme.red};
   path {
     stroke-width: 6px;
     stroke: white;
@@ -35,20 +34,26 @@ const Items = styled.ul`
 `;
 const Item = styled.li`
   margin-right: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  color: ${(props) => props.theme.white.darker};
+  transition: color 0.3s ease-in-out;
   position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  &:hover {
+    color: ${(props) => props.theme.white.lighter};
+  }
 `;
-
-const Circle = styled(motion.span)<{ isActive: boolean }>`
+const Circle = styled(motion.span)`
   position: absolute;
   width: 5px;
   height: 5px;
-  bottom: -10px;
-  border-radius: 100px;
-  background-color: ${props =>
-    props.isActive ? props.theme.red : "transparent"};
+  border-radius: 5px;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background-color: ${(props) => props.theme.red};
 `;
 
 const logoVariants = {
@@ -61,7 +66,7 @@ const Header = () => {
   const TVMatch = useMatch("/tv");
 
   const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", latest => {
+  useMotionValueEvent(scrollY, "change", (latest) => {
     console.log("Page scroll: ", latest);
   });
   return (
@@ -81,11 +86,11 @@ const Header = () => {
         <Items>
           <Item>
             <Link to="/">Home</Link>
-            <Circle layoutId="box" isActive={HomeMatch !== null} />
+            {HomeMatch && <Circle layoutId="circle" />}
           </Item>
           <Item>
             <Link to="/tv">TV Shows</Link>
-            <Circle layoutId="box" isActive={TVMatch !== null} />
+            {TVMatch && <Circle layoutId="circle" />}
           </Item>
         </Items>
       </Col>
