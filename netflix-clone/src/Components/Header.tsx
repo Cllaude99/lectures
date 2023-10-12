@@ -1,4 +1,5 @@
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
 
@@ -55,16 +56,49 @@ const Circle = styled(motion.span)`
   margin: 0 auto;
   background-color: ${(props) => props.theme.red};
 `;
+const Search = styled(motion.span)`
+  color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
+  svg {
+    height: 25px;
+  }
+`;
+
+const Input = styled(motion.input)`
+  transform-origin: right center;
+  position: absolute;
+  right: 0px;
+  padding: 5px 10px;
+  padding-left: 40px;
+  z-index: -1;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  border: 1px solid ${(props) => props.theme.white.lighter};
+`;
 
 const logoVariants = {
   normal: { fillOpacity: 1 },
   active: { fillOpacity: 0 },
 };
-
+const searchVariants = {
+  initial: {},
+  animate: (searchOpen: boolean) => ({ x: searchOpen ? -215 : 0 }),
+};
+const inputVariants = {
+  initial: { scaleX: 0 },
+  animate: (searchOpen: boolean) => ({ scaleX: searchOpen ? 1 : 0 }),
+};
 const Header = () => {
   const HomeMatch = useMatch("/");
   const TVMatch = useMatch("/tv");
+  const [searchOpen, setSearchOpen] = useState(false);
 
+  const toggleSearch = () => {
+    setSearchOpen((prev) => !prev);
+  };
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
     console.log("Page scroll: ", latest);
@@ -95,7 +129,33 @@ const Header = () => {
         </Items>
       </Col>
       <Col>
-        <button>search</button>
+        <Search>
+          <motion.svg
+            onClick={toggleSearch}
+            variants={searchVariants}
+            initial="initial"
+            animate="animate"
+            transition={{ type: "linear" }}
+            custom={searchOpen}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              clipRule="evenodd"
+            ></path>
+          </motion.svg>
+          <Input
+            placeholder="Search for movie or tv show.."
+            variants={inputVariants}
+            initial="initial"
+            animate="animate"
+            transition={{ type: "linear" }}
+            custom={searchOpen}
+          />
+        </Search>
       </Col>
     </Nav>
   );
