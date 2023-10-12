@@ -1,4 +1,9 @@
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useMotionValueEvent,
+  useAnimation,
+} from "framer-motion";
 import { useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
@@ -91,9 +96,17 @@ const inputVariants = {
   initial: { scaleX: 0 },
   animate: (searchOpen: boolean) => ({ scaleX: searchOpen ? 1 : 0 }),
 };
+const navVariants = {
+  up: {
+    backgroundColor: "rgba(0,0,0,0)",
+  },
+  scroll: { backgroundColor: "rgba(0,0,0,1)" },
+};
+
 const Header = () => {
   const HomeMatch = useMatch("/");
   const TVMatch = useMatch("/tv");
+  const navAnimation = useAnimation();
   const [searchOpen, setSearchOpen] = useState(false);
 
   const toggleSearch = () => {
@@ -101,10 +114,14 @@ const Header = () => {
   };
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
-    console.log("Page scroll: ", latest);
+    if (latest > 80) {
+      navAnimation.start("scroll");
+    } else {
+      navAnimation.start("up");
+    }
   });
   return (
-    <Nav>
+    <Nav variants={navVariants} initial="up" animate={navAnimation}>
       <Col>
         <Logo
           variants={logoVariants}
